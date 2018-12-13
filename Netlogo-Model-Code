@@ -1,0 +1,51 @@
+globals [ one-fortieth random-under-ten ]
+turtles-own [ wealth ]
+
+to setup
+  clear-all
+  create-turtles 500 [
+    set wealth random 200
+    set shape "circle"
+    set color green
+
+    ;; visualize the turtles from left to right in ascending order of wealth
+    setxy wealth random-ycor
+  ]
+  reset-ticks
+end
+
+to go
+  ;; transact and then update your location
+  ask turtles with [ wealth > 10 ] [ transact ]
+  ;; prevent wealthy turtles from moving too far to the right
+  ask turtles [ if wealth <= max-pxcor [ set xcor wealth ] ]
+  tick
+end
+
+to transact
+  ;; give one dollar to another turtle for trade - ten per cent taxation
+  set random-under-ten random wealth / 10
+  set wealth wealth - 10 ;;random-under-ten
+  ask one-of other turtles [ set wealth wealth + 10] ;;random-under-ten ]
+  ;;ask one-of other turtles [ set wealth wealth + 1 ]
+
+  ;;taxation for social assistance to the poor 
+  ;;ask one-of other min-n-of (count turtles * 0.10) turtles [ wealth ] [ set wealth wealth + 1 ]
+
+  ;;give one fortieth of your wealth to another turtle for peace (almsgiving)
+  set one-fortieth (wealth / 40)
+  set wealth (wealth - one-fortieth)
+  ask one-of other turtles [ set wealth (wealth + one-fortieth) ]
+end
+
+to-report top-10-pct-wealth
+  report sum [ wealth ] of max-n-of (count turtles * 0.10) turtles [ wealth ]
+end
+
+to-report bottom-50-pct-wealth
+  report sum [ wealth ] of min-n-of (count turtles * 0.50) turtles [ wealth ]
+end
+
+to-report total-wealth
+  report sum [ wealth ] of turtles
+end
